@@ -45,6 +45,9 @@ public class BuildingElevatorController implements ButtonObserver {
         for(int i=0 ; i<noOfElevatorCars ; ++i){
             elevatorCarControllers.add(new ElevatorCarController(floors.get(0), i+1));
         }
+    }
+
+    public void startElevatorSystem(){
         for (ElevatorCarController elevatorCarController : elevatorCarControllers) {
             Future<?> future = executorService.submit(elevatorCarController.startElevator());
             elevatorCarControllerFutureMap.put(elevatorCarController, future);
@@ -71,6 +74,7 @@ public class BuildingElevatorController implements ButtonObserver {
 
     @Override
     public void onButtonPress(Button button) {
+        System.out.println("Request received from floor " + ((ExternalButton) button).getFloorNumber() + " for direction " + ((ExternalButton) button).getSymbol());
         ExternalButton externalButton = (ExternalButton) button;
         ElevatorCarController selectedElevator = null;
         if(externalButton.getSymbol() == ExternalButtonSymbols.UP){
@@ -116,6 +120,20 @@ public class BuildingElevatorController implements ButtonObserver {
         }
         else{
             //TODO: Implement logic when no elevator is free and all are moving in opposite direction
+        }
+    }
+
+    public void requestElevator(int floorNumber, ExternalButtonSymbols direction){
+        for (Floor floor : floors) {
+            if(floor.getFloorNumber() == floorNumber){
+                for(Button button: floor.getButtons()){
+                    if(button instanceof ExternalButton){
+                        if(((ExternalButton) button).getSymbol() == direction){
+                            button.onPress();
+                        }
+                    }
+                }
+            }
         }
     }
 
