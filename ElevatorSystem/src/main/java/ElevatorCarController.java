@@ -14,6 +14,12 @@ public class ElevatorCarController implements ButtonObserver {
     private Floor currentFloor;
     private boolean isMoving;
 
+    private boolean isCalled; //to check if the elevator is called to a floor
+
+    private Floor destinationFloor;
+
+    private Direction direction;
+
     private final Set<Integer> floorsToVisit = new HashSet<>();
 
     private final ReentrantLock lock = new ReentrantLock();
@@ -32,7 +38,8 @@ public class ElevatorCarController implements ButtonObserver {
     public void acceptRequest(int floorNumber) {
         try{
             lock.lock();
-            System.out.println("Moving to floor " + floorNumber);
+            isCalled = true ;
+            System.out.println("Elevator " + elevatorCar.getCarId() + " is moving to floor " + floorNumber);
             floorsToVisit.add(floorNumber);
             condition.signal();
         } finally {
@@ -52,8 +59,10 @@ public class ElevatorCarController implements ButtonObserver {
                 isMoving = true;
                 int nextFloor = floorsToVisit.iterator().next();
                 if(currentFloor.getFloorNumber() == nextFloor){
-                    System.out.println("Elevator has reached floor " + nextFloor);
+                    System.out.println("Elevator " + this.elevatorCar.getCarId() + " has reached floor " + nextFloor);
                     floorsToVisit.remove(nextFloor);
+                    this.elevatorCar.setDirection(Direction.STATIONARY);
+                    this.isCalled = false ;
                     Thread.sleep(5000);
                 } else if(currentFloor.getFloorNumber() < nextFloor){
                     this.elevatorCar.setDirection(Direction.UP);
@@ -103,5 +112,49 @@ public class ElevatorCarController implements ButtonObserver {
 
     public Floor getCurrentFloor() {
         return currentFloor;
+    }
+
+    public void setCurrentFloor(Floor currentFloor) {
+        this.currentFloor = currentFloor;
+    }
+
+    public void setMoving(boolean moving) {
+        isMoving = moving;
+    }
+
+    public boolean isCalled() {
+        return isCalled;
+    }
+
+    public void setCalled(boolean called) {
+        isCalled = called;
+    }
+
+    public Floor getDestinationFloor() {
+        return destinationFloor;
+    }
+
+    public void setDestinationFloor(Floor destinationFloor) {
+        this.destinationFloor = destinationFloor;
+    }
+
+    public Direction getDirection() {
+        return direction;
+    }
+
+    public void setDirection(Direction direction) {
+        this.direction = direction;
+    }
+
+    public Set<Integer> getFloorsToVisit() {
+        return floorsToVisit;
+    }
+
+    public ReentrantLock getLock() {
+        return lock;
+    }
+
+    public Condition getCondition() {
+        return condition;
     }
 }

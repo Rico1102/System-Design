@@ -16,16 +16,13 @@ public class ElevatorCar {
 
     private boolean isMoving;
 
-    private boolean isCalled; //to check if the elevator is called to a floor
-
     List<Button> buttons;
 
     public ElevatorCar(int elevatorCarId){
         this.carId = elevatorCarId + "";
         this.capacity = "10";
         this.direction = Direction.STATIONARY;
-        this.buttons = new ArrayList<Button>();
-        this.isCalled = false;
+        this.buttons = new ArrayList<>();
         this.isMoving = false;
         for(int i=1 ; i<=9 ; ++i){
             buttons.add(new InternalButton(InternalButtonSymbols.getInternalButtonSymbol(i+""), i));
@@ -74,13 +71,5 @@ public class ElevatorCar {
 
     public void setButtons(List<Button> buttons) {
         this.buttons = buttons;
-    }
-
-    public boolean isCalled() {
-        return isCalled;
-    }
-
-    public void setCalled(boolean called) {
-        isCalled = called;
     }
 }

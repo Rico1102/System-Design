@@ -53,10 +53,15 @@ public class BuildingElevatorController implements ButtonObserver {
             elevatorCarControllerFutureMap.put(elevatorCarController, future);
         }
         executorService.submit(() -> {
+            try {
+                Thread.sleep(2000);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
             while (!Thread.currentThread().isInterrupted()) {
                 showElevatorStatus();
                 try {
-                    Thread.sleep(2000);
+                    Thread.sleep(5000);
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                 }
@@ -65,11 +70,13 @@ public class BuildingElevatorController implements ButtonObserver {
     }
 
     public void showElevatorStatus(){
+        System.out.println("--------------------Elevator Status----------------------");
         for(ElevatorCarController elevatorCarController: elevatorCarControllers){
             //TODO: implement logic to show the status of each elevator
             System.out.println("Elevator " + elevatorCarController.getElevatorCar().getCarId() + " is at floor " + elevatorCarController.getCurrentFloor().getFloorNumber() + " and is " +
                     (elevatorCarController.getElevatorCar().getDirection() == Direction.STATIONARY ? " Stationary " : " moving in direction : " + elevatorCarController.getElevatorCar().getDirection()));
         }
+        System.out.println("--------------------------------------------------------");
     }
 
     @Override
@@ -81,14 +88,14 @@ public class BuildingElevatorController implements ButtonObserver {
             long timeToReach = Long.MAX_VALUE;
             //Try to find the elevator which is closest to this floor and is moving in the upward direction
             for(ElevatorCarController elevatorCarController: elevatorCarControllers){
-                if(elevatorCarController.getElevatorCar().getDirection() == Direction.UP){
+                if(!elevatorCarController.isCalled() && elevatorCarController.getElevatorCar().getDirection() == Direction.UP){
                     if(elevatorCarController.getCurrentFloor().getFloorNumber() < externalButton.getFloorNumber()){
                         if(timeToReach > Math.abs(elevatorCarController.getCurrentFloor().getFloorNumber() - externalButton.getFloorNumber())){
                             timeToReach = Math.abs(elevatorCarController.getCurrentFloor().getFloorNumber() - externalButton.getFloorNumber());
                             selectedElevator = elevatorCarController;
                         }
                     }
-                } else if(elevatorCarController.getElevatorCar().getDirection() == Direction.STATIONARY){
+                } else if(!elevatorCarController.isCalled() && elevatorCarController.getElevatorCar().getDirection() == Direction.STATIONARY){
                     if(timeToReach > Math.abs(elevatorCarController.getCurrentFloor().getFloorNumber() - externalButton.getFloorNumber())){
                         timeToReach = Math.abs(elevatorCarController.getCurrentFloor().getFloorNumber() - externalButton.getFloorNumber());
                         selectedElevator = elevatorCarController;
@@ -100,14 +107,14 @@ public class BuildingElevatorController implements ButtonObserver {
             long timeToReach = Long.MAX_VALUE;
             //Try to find the elevator which is closest to this floor and is moving in the upward direction
             for(ElevatorCarController elevatorCarController: elevatorCarControllers){
-                if(elevatorCarController.getElevatorCar().getDirection() == Direction.DOWN){
+                if(!elevatorCarController.isCalled() && elevatorCarController.getElevatorCar().getDirection() == Direction.DOWN){
                     if(elevatorCarController.getCurrentFloor().getFloorNumber() < externalButton.getFloorNumber()){
                         if(timeToReach > Math.abs(elevatorCarController.getCurrentFloor().getFloorNumber() - externalButton.getFloorNumber())){
                             timeToReach = Math.abs(elevatorCarController.getCurrentFloor().getFloorNumber() - externalButton.getFloorNumber());
                             selectedElevator = elevatorCarController;
                         }
                     }
-                } else if(elevatorCarController.getElevatorCar().getDirection() == Direction.STATIONARY){
+                } else if(!elevatorCarController.isCalled() && elevatorCarController.getElevatorCar().getDirection() == Direction.STATIONARY){
                     if(timeToReach > Math.abs(elevatorCarController.getCurrentFloor().getFloorNumber() - externalButton.getFloorNumber())){
                         timeToReach = Math.abs(elevatorCarController.getCurrentFloor().getFloorNumber() - externalButton.getFloorNumber());
                         selectedElevator = elevatorCarController;
@@ -116,6 +123,7 @@ public class BuildingElevatorController implements ButtonObserver {
             }
         }
         if(selectedElevator != null){
+            System.out.println("Selected elevator is " + selectedElevator.getElevatorCar().getCarId() + " to serve the request");
             selectedElevator.acceptRequest(externalButton.getFloorNumber());
         }
         else{
@@ -125,14 +133,19 @@ public class BuildingElevatorController implements ButtonObserver {
 
     public void requestElevator(int floorNumber, ExternalButtonSymbols direction){
         for (Floor floor : floors) {
+//            System.out.println("Checking floor: " + floor.getFloorNumber());
             if(floor.getFloorNumber() == floorNumber){
+//                System.out.println("Floor Selected: " + floorNumber + " Direction: " + direction);
                 for(Button button: floor.getButtons()){
                     if(button instanceof ExternalButton){
                         if(((ExternalButton) button).getSymbol() == direction){
+//                            System.out.println("Button - Request received from floor " + floorNumber + " for direction " + direction);
                             button.onPress();
+                            break ;
                         }
                     }
                 }
+                break ;
             }
         }
     }
