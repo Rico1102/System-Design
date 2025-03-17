@@ -11,20 +11,14 @@ import java.util.concurrent.locks.ReentrantLock;
 public class ElevatorCarController implements ButtonObserver {
 
     private final ElevatorCar elevatorCar;
+    private final Set<Integer> floorsToVisit = new HashSet<>();
+    private final ReentrantLock lock = new ReentrantLock();
+    private final Condition condition = lock.newCondition();
     private Floor currentFloor;
     private boolean isMoving;
-
     private boolean isCalled; //to check if the elevator is called to a floor
-
     private Floor destinationFloor;
-
     private Direction direction;
-
-    private final Set<Integer> floorsToVisit = new HashSet<>();
-
-    private final ReentrantLock lock = new ReentrantLock();
-
-    private final Condition condition = lock.newCondition();
 
     public ElevatorCarController(Floor floor, int elevatorCarId) {
         this.elevatorCar = new ElevatorCar(elevatorCarId);
@@ -36,9 +30,9 @@ public class ElevatorCarController implements ButtonObserver {
     }
 
     public void acceptRequest(int floorNumber) {
-        try{
+        try {
             lock.lock();
-            isCalled = true ;
+            isCalled = true;
             System.out.println("Elevator " + elevatorCar.getCarId() + " is moving to floor " + floorNumber);
             floorsToVisit.add(floorNumber);
             condition.signal();
@@ -58,13 +52,13 @@ public class ElevatorCarController implements ButtonObserver {
                 }
                 isMoving = true;
                 int nextFloor = floorsToVisit.iterator().next();
-                if(currentFloor.getFloorNumber() == nextFloor){
+                if (currentFloor.getFloorNumber() == nextFloor) {
                     System.out.println("Elevator " + this.elevatorCar.getCarId() + " has reached floor " + nextFloor);
                     floorsToVisit.remove(nextFloor);
                     this.elevatorCar.setDirection(Direction.STATIONARY);
-                    this.isCalled = false ;
+                    this.isCalled = false;
                     Thread.sleep(5000);
-                } else if(currentFloor.getFloorNumber() < nextFloor){
+                } else if (currentFloor.getFloorNumber() < nextFloor) {
                     this.elevatorCar.setDirection(Direction.UP);
                     currentFloor = currentFloor.getNextFloor();
                     Thread.sleep(1000);
@@ -84,7 +78,7 @@ public class ElevatorCarController implements ButtonObserver {
     public void onButtonPress(Button button) {
         InternalButton internalButton = (InternalButton) button;
         if (((InternalButtonSymbols) button.getSymbol()).isFloorButton()) {
-            try{
+            try {
                 lock.lock();
                 //TODO: Implement logic to move the elevator to the requested floor
                 System.out.println("Adding the request to queue " + internalButton.getFloorNumber());
@@ -98,12 +92,16 @@ public class ElevatorCarController implements ButtonObserver {
         }
     }
 
-    public Runnable startElevator(){
+    public Runnable startElevator() {
         return this::moveElevator;
     }
 
     public boolean isMoving() {
         return isMoving;
+    }
+
+    public void setMoving(boolean moving) {
+        isMoving = moving;
     }
 
     public ElevatorCar getElevatorCar() {
@@ -116,10 +114,6 @@ public class ElevatorCarController implements ButtonObserver {
 
     public void setCurrentFloor(Floor currentFloor) {
         this.currentFloor = currentFloor;
-    }
-
-    public void setMoving(boolean moving) {
-        isMoving = moving;
     }
 
     public boolean isCalled() {
