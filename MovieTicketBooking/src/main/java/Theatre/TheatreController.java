@@ -11,29 +11,29 @@ public class TheatreController {
 
     List<Theatre> theatres;
 
-    public TheatreController(){
+    public TheatreController() {
         this.theatres = new ArrayList<>();
     }
 
-    public Map<Theatre, List<Show>> findShows(Movie movie, City city){
+    public Map<Theatre, List<Show>> findShows(Movie movie, City city) {
         Map<Theatre, List<Show>> showsMap = new HashMap<>();
-        for(Theatre theatre : theatres){
-            if(theatre.getCity().equals(city)){
+        for (Theatre theatre : theatres) {
+            if (theatre.getCity().equals(city)) {
                 showsMap.put(theatre, theatre.getShowsForAMovie(movie));
             }
         }
         return showsMap;
     }
 
-    public void addTheatre(Theatre theatre){
+    public void addTheatre(Theatre theatre) {
         theatres.add(theatre);
     }
 
-    public void removeTheatre(Theatre theatre){
+    public void removeTheatre(Theatre theatre) {
         theatres.remove(theatre);
     }
 
-    public List<Theatre> getTheatres(){
+    public List<Theatre> getTheatres() {
         return theatres;
     }
 

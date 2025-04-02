@@ -7,10 +7,8 @@ public class Seat {
     private final String seatNumber;
 
     private final SeatType seatType;
-
+    private final ReentrantLock lock = new ReentrantLock();
     private boolean isBooked;
-
-    private ReentrantLock lock = new ReentrantLock();
 
     public Seat(String seatNumber, SeatType seatType) {
         this.seatNumber = seatNumber;
