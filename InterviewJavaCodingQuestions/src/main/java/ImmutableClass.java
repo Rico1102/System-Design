@@ -1,11 +1,14 @@
-public class ImmutableClass {
+public final class ImmutableClass {
 
-    // All fields are private and final to ensure immutability
-    // and cannot be changed after the object is created
-    private final String data1 ;
-    private final String data2 ;
-    private final String data3 ;
-    private final String data4 ;
+    /**
+     * Class should be defined as final to prevent inheritance, as subclass can modify the behavior and introduce mutability
+     * All fields are private and final to ensure immutability
+     * and cannot be changed after the object is created
+     **/
+    private final String data1;
+    private final String data2;
+    private final String data3;
+    private final String data4;
 
     //Constructor initializes all fields
     public ImmutableClass(String data1, String data2, String data3, String data4) {
