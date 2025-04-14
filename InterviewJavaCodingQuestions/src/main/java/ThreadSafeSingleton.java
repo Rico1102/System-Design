@@ -12,14 +12,14 @@ public class ThreadSafeSingleton {
 
     public static ThreadSafeSingleton getInstance() {
         // Double-checked locking to ensure thread safety
-        if(instance == null){
+        if (instance == null) {
             synchronized (ThreadSafeSingleton.class) {
                 if (instance == null) {
                     instance = new ThreadSafeSingleton();
                 }
             }
         }
-        return instance ;
+        return instance;
     }
 
 }
