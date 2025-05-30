@@ -1,6 +1,6 @@
 package Splitwise.balanceSheet;
 
-public enum MoneyFlow {
+public enum MoneyFlowType {
 
     CREDIT,
     DEBIT

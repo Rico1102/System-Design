@@ -1,47 +1,48 @@
 package Splitwise.expense;
 
-import Splitwise.Split;
 import Splitwise.User;
-import Splitwise.splitStrategy.SplitStrategy;
-import lombok.*;
+import Splitwise.expense.split.EqualSplit;
+import Splitwise.expense.split.PercentageSplit;
+import Splitwise.expense.split.Split;
+import Splitwise.expense.split.SplitStrategy;
+import lombok.Getter;
+import lombok.Setter;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
 @Getter
 @Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
-public class Expense {
+public abstract class Expense {
 
-    private UUID id;
-    private String description;
-    private double amount;
-    private List<Split> splits ;
-    private SplitStrategy splitStrategy;
+    UUID uuid ;
+    String description ;
+    User paidBy ;
+    double amount ;
+    SplitStrategy strategy ;
 
-    private void markTheSplits(){
-        for(Split split : this.splits){
-            split.setExpenseUUID(this.id);
-        }
-    }
-    public boolean validateExpense(){
-        markTheSplits();
-        return this.splitStrategy.validate(this.splits, this.amount) ;
+    public Expense(String description, User payer, double amount, String strategy){
+        this.description = description ;
+        this.paidBy = payer;
+        this.amount = amount;
+        this.strategy = getStrategy(strategy) ;
     }
 
-    public void updateUsers(){
-        Set<User> users = new HashSet<>();
-        users.add(splits.get(0).getPayer()) ;
-        for(Split split : splits){
-            users.add(split.getPayee()) ;
-        }
-        for(User user : users){
-            user.getExpenses().add(this) ;
+    private SplitStrategy getStrategy(String strategy){
+        switch (strategy){
+            case "EQUAL":
+                return new EqualSplit() ;
+            case "PERCENTAGE":
+                return new PercentageSplit();
+            default:
+                throw new RuntimeException("Invalid Split!!!") ;
         }
     }
+
+    abstract public void validateAndGenerateSplit() ;
+
+    abstract public void updateBalanceSheet() ;
+
+    abstract public void printUserShare(User user) ;
 
 }

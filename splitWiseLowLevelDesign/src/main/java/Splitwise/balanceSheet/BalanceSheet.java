@@ -1,48 +1,35 @@
 package Splitwise.balanceSheet;
 
-import Splitwise.Split;
 import Splitwise.User;
-import lombok.*;
+import Splitwise.expense.Expense;
+import Splitwise.expense.split.Split;
+import lombok.Getter;
+import lombok.Setter;
 
-import java.util.List;
+import java.util.HashMap;
 import java.util.Map;
 
 @Getter
 @Setter
-@AllArgsConstructor
-@NoArgsConstructor
-@Builder
-public class BalanceSheet {
+public abstract class BalanceSheet {
 
-    User user;
-    Map<User, List<Split>> transactionMap ;
-    Map<User, Balance> balanceMap ;
+    Map<User, Double> balanceMap;
 
-    public void addSplit(Split split){
-        if(split.getPayer() == user){
-            transactionMap.get(split.getPayee()).add(split) ;
-        }
-        else{
-            transactionMap.get(split.getPayer()).add(split) ;
-        }
+    public BalanceSheet(){
+        balanceMap = new HashMap<>() ;
     }
 
-    public void deleteSplit(Split split){
-        if(split.getPayer() == user){
-            transactionMap.get(split.getPayee()).add(split) ;
-        }
-        else{
-            transactionMap.get(split.getPayer()).add(split) ;
-        }
+    private void updateBalance(Split split){
+        balanceMap.put(split.getPaidBy() , balanceMap.get(split.getPaidBy()) + split.getAmount()) ;
+        balanceMap.put(split.getPaidFor() , balanceMap.get(split.getPaidBy()) - split.getAmount()) ;
     }
 
-    public void updateSplit(Split split){
-        if(split.getPayer() == user){
-            transactionMap.get(split.getPayee()).add(split) ;
-        }
-        else{
-            transactionMap.get(split.getPayer()).add(split) ;
-        }
-    }
+    abstract public void addExpense() ;
+
+    abstract public void updateExpense() ;
+
+    abstract public void deleteExpense() ;
+
+    abstract public void printUserBalanceSheet(User user) ;
 
 }
